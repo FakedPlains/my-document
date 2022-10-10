@@ -4,7 +4,7 @@
 
 > [Docker 官网地址](https://www.docker.com/)
 
-### 卸载旧版本
+### 1. 卸载旧版本
 
 ```shell
 sudo yum remove docker \
@@ -17,7 +17,7 @@ sudo yum remove docker \
                 docker-engine
 ```
 
-### 使用 Docker 仓库安装 Docker Engine-Community
+### 2. 使用 Docker 仓库安装 Docker Engine-Community
 
 #### 设置仓库
 
@@ -41,7 +41,7 @@ sudo yum-config-manager \
 sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
-### 使用 Docker
+### 3. 使用 Docker
 
 #### 启动 Docker
 
@@ -55,7 +55,7 @@ sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-### Docker 镜像加速
+### 4.Docker 镜像加速
 
 #### 获取阿里云镜像
 
@@ -78,3 +78,77 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
+
+
+## 二、Docker 安装 Nginx
+
+### 1. 下载 Nginx 镜像
+
+```shell
+docker pull nginx:1.22.0
+```
+
+### 2. 创建挂载目录
+
+#### 创建挂载目录
+
+```shell
+mkdir -p /usr/local/docker/nginx/conf
+mkdir -p /usr/local/docker/nginx/log
+mkdir -p /usr/local/docker/nginx/html
+```
+
+#### 复制容器中的文件到宿主机
+
+```shell
+# 生成容器
+docker run --name nginx -p 80:80 -d nginx
+# 将容器 nginx.conf 文件复制到宿主机
+docker cp nginx:/etc/nginx/nginx.conf /usr/local/docker/nginx/conf/nginx.conf
+# 将容器 conf.d 文件夹下内容复制到宿主机
+docker cp nginx:/etc/nginx/conf.d /usr/local/docker/nginx/conf/conf.d
+# 将容器中的 html 文件夹复制到宿主机
+docker cp nginx:/usr/share/nginx/html /usr/local/docker/nginx/
+```
+
+### 3. 创建 Nginx 容器并运行
+
+#### 删除原容器
+
+```shell
+# 关闭该容器
+docker stop nginx
+# 删除该容器
+docker rm nginx
+```
+
+#### 创建 Nginx 容器挂载文件并运行
+
+```shell
+docker run \
+-p 80:80 \
+--name nginx \
+-v /usr/local/docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf \
+-v /usr/local/docker/nginx/conf/conf.d:/etc/nginx/conf.d \
+-v /usr/local/docker/nginx/log:/var/log/nginx \
+-v /usr/local/docker/nginx/html:/usr/share/nginx/html \
+--restart=always \
+-d nginx:1.22.0
+```
+
+- 参数说明
+
+  | 命令                                                         | 描述                     |
+  | ------------------------------------------------------------ | ------------------------ |
+  | -p 80:80                                                     | 容器与主机端口映射       |
+  | --name nginx                                                 | 启动容器的名字           |
+  | -v /usr/local/docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf | 挂载 nginx.conf 配置文件 |
+  | -v /usr/local/docker/nginx/conf/conf.d:/etc/nginx/conf.d     | 挂载 nginx 配置文件      |
+  | -v /usr/local/docker/nginx/log:/var/log/nginx                | 挂载 nginx 日志文件      |
+  | -v /usr/local/docker/nginx/html:/usr/share/nginx/html        | 挂载 nginx 内容          |
+  | --restart=always                                             | 容器重启策略             |
+  | -d                                                           | 后台运行                 |
+  | nginx:1.22.0                                                 | 本地运行的版本           |
+  | \                                                            | shell 命令换行           |
+
+  
