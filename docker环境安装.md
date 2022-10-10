@@ -152,3 +152,50 @@ docker run \
   | \                                                            | shell 命令换行           |
 
   
+
+## 三、Docker 安装 MySQL
+
+### 1. 下载 MySQL 镜像
+
+```shell
+docker pull mysql:8.0.28
+```
+
+### 2. 创建挂载目录
+
+```shell
+mkdir -p /usr/local/docker/mysql/conf
+mkdir -p /usr/local/docker/mysql/log
+mkdir -p /usr/local/docker/mysql/data
+```
+
+### 3. 创建 MySQL 容器并运行
+
+```shell
+docker run \
+-p 3306:3306 \
+--name mysql \
+-v /usr/local/docker/mysql/log:/var/log/mysql \
+-v /usr/local/docker/mysql/data:/var/lib/mysql \
+-v /usr/local/docker/mysql/conf:/etc/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 \
+--restart=always \
+-d mysql:8.0.28
+```
+
+- 参数说明
+
+  | 命令                                           | 描述                |
+  | ---------------------------------------------- | ------------------- |
+  | -p 3306:3306                                   | 容器与主机端口映射  |
+  | --name mysql                                   | 启动容器的名字      |
+  | -v /usr/local/docker/mysql/log:/var/log/mysql  | 挂载日志文件        |
+  | -v /usr/local/docker/mysql/data:/var/lib/mysql | 挂载 MySQL 存储文件 |
+  | -v /usr/local/docker/mysql/conf:/etc/mysql     | 挂载配置文件        |
+  | -e MYSQL_ROOT_PASSWORD=123456                  | 设置 root 用户密码  |
+  | --restart=always                               | 容器重启策略        |
+  | -d                                             | 后台运行            |
+  | mysql:8.0.28                                   | 本地运行的版本      |
+  | \                                              | shell 命令换行      |
+
+  
